@@ -98,6 +98,8 @@ bool manualStop() {
 void stopLift() {
   digitalWrite(pinLiftUp, LOW);
   digitalWrite(pinLiftDown, LOW);
+  liftRunningDown = false;
+  liftRunningUp = false;
 }
 
 void setLiftUp() {
