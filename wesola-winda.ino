@@ -21,6 +21,11 @@ bool liftRunningDown = false;
 bool liftUp = false;
 bool liftDown = false;
 
+// "blokadki" przycisków - true gdy obsłużyliśmy wciśnięcie i jeszcze nie został puszczony
+bool lockPressBtnUp = false;
+bool lockPressBtnDown = false;
+
+
 void setup() {
   pinMode(pinLiftUp, OUTPUT);
   pinMode(pinLiftDown, OUTPUT);
@@ -128,11 +133,27 @@ bool calledDown() {
 }
 
 bool pressedBtnUp() {
-  return digitalRead(pinBtnUp) == LOW;
+  if (!lockPressBtnUp && digitalRead(pinBtnUp) == LOW) {
+    lockPressBtnUp = true;
+    return true;
+  }
+  else if (lockPressBtnUp && digitalRead(pinBtnUp) == HIGH) { // press locked but btn not pressed - so unlocking
+    lockPressBtnUp = false;
+    return false;
+  }
+  return false;
 }
 
 bool pressedBtnDown() {
-  return digitalRead(pinBtnDown) == LOW;
+  if (!lockPressBtnDown && digitalRead(pinBtnDown) == LOW) {
+    lockPressBtnDown = true;
+    return true;
+  }
+  else if (lockPressBtnDown && digitalRead(pinBtnDown) == HIGH) { // press locked but btn not pressed - so unlocking
+    lockPressBtnDown = false;
+    return false;
+  }
+  return false;
 }
 
 bool canStartUp() {
@@ -160,3 +181,8 @@ void startLiftDown() {
     digitalWrite(pinLiftDown, HIGH);
   }
 }
+
+/*
+ * @todo:
+ * - winda ruszyła w dół/górę, ktoś zatrzymał przyciskiem w windzie (manualStop) ale winda przejechała tak niewiele, że krańcówka nadal aktywna, a stan już się ustawił jako middle; można by sprawdzać krańcówki ustawiając windę jako middle
+ */
