@@ -25,6 +25,11 @@ bool liftDown = false;
 bool lockPressBtnUp = false;
 bool lockPressBtnDown = false;
 
+const int ledsBlinkingInterval = 800;
+bool ledsBlinking = false;
+int ledsCallState = LOW;
+unsigned long ledsLastTime;
+
 
 void setup() {
   pinMode(pinLiftUp, OUTPUT);
@@ -73,6 +78,9 @@ void loop() {
     }
   }
 
+  if (ledsBlinking) {
+    processLedsBlinking();
+  }
   // @todo: obsłużyć ledy i reakcje na przyciski "call" gdy winda jedzie - a dokładnie brak tej reakcji (czyli tylko migać ledami)
 }
 
@@ -105,6 +113,8 @@ void stopLift() {
   digitalWrite(pinLiftDown, LOW);
   liftRunningDown = false;
   liftRunningUp = false;
+
+  stopLedsBlinking();
 }
 
 void setLiftUp() {
@@ -170,6 +180,8 @@ void startLiftUp() {
     liftRunningDown = false;
     digitalWrite(pinLiftDown, LOW);
     digitalWrite(pinLiftUp, HIGH);
+
+    ledsBlinking = true;
   }
 }
 
@@ -179,7 +191,32 @@ void startLiftDown() {
     liftRunningDown = true;
     digitalWrite(pinLiftUp, LOW);
     digitalWrite(pinLiftDown, HIGH);
+
+    ledsBlinking = true;
   }
+}
+
+void processLedsBlinking() {
+  unsigned long currentTime = millis();
+  if (currentTime - ledsLastTime >= ledsBlinkingInterval) {
+    ledsLastTime = currentTime;
+
+    if (ledsCallState == LOW) {
+      ledsCallState = HIGH;
+    }
+    else {
+      ledsCallState = LOW;
+    }
+    digitalWrite(pinLedCallUp, ledsCallState);
+    digitalWrite(pinLedCallDown, ledsCallState);
+  }
+}
+
+void stopLedsBlinking() {
+  ledsBlinking = false;
+  ledsCallState = LOW;
+  digitalWrite(pinLedCallUp, ledsCallState);
+  digitalWrite(pinLedCallDown, ledsCallState);
 }
 
 /*
