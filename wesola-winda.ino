@@ -1,16 +1,19 @@
-// konfiguracja pinow
+// pins configuration
+// pins 0-1 are for serial communication
 const int pinLiftUp = 2;
 const int pinLiftDown = 3;
-const int pinStopUp = 4;
-const int pinStopDown = 5;
-const int pinCallUp = 6;
-const int pinCallDown = 7;
-const int pinBtnUp = 8;
-const int pinBtnDown = 9;
-const int pinLedCallUp = 10;
-const int pinLedCallDown = 11;
-const int pinLedBtnUp = 12;
-const int pinLedBtnDown = 14;
+const int pinLiftPower = 4;
+const int pinCallUp = 5;
+const int pinCallDown = 6;
+const int pinBtnUp = 7;
+const int pinBtnDown = 8;
+const int pinLedCallUp = 9;
+const int pinLedCallDown = 10;
+const int pinLedBtnUp = 11;
+const int pinLedBtnDown = 12;
+// pin 13 is for builtin LED
+const int pinStopUp = 14;
+const int pinStopDown = 15;
 
 // zmienne na potrzeby rozróżniania stanów
 //czy jedzie
@@ -34,6 +37,7 @@ unsigned long ledsLastTime;
 void setup() {
   pinMode(pinLiftUp, OUTPUT);
   pinMode(pinLiftDown, OUTPUT);
+  pinMode(pinLiftPower, OUTPUT);
   pinMode(pinStopUp, INPUT);
   pinMode(pinStopDown, INPUT);
   pinMode(pinCallUp, INPUT_PULLUP);
@@ -111,6 +115,7 @@ bool manualStop() {
 void stopLift() {
   digitalWrite(pinLiftUp, LOW);
   digitalWrite(pinLiftDown, LOW);
+  digitalWrite(pinLiftPower, LOW);
   liftRunningDown = false;
   liftRunningUp = false;
 
@@ -132,7 +137,7 @@ void setLiftMiddle() {
   liftDown = false;
 }
 
-// call and lift buttons working on reverse logic
+// call and in-lift buttons working on reverse logic
 
 bool calledUp() {
   return digitalRead(pinCallUp) == LOW;
@@ -180,6 +185,7 @@ void startLiftUp() {
     liftRunningDown = false;
     digitalWrite(pinLiftDown, LOW);
     digitalWrite(pinLiftUp, HIGH);
+    digitalWrite(pinLiftPower, HIGH);
 
     ledsBlinking = true;
   }
@@ -191,6 +197,7 @@ void startLiftDown() {
     liftRunningDown = true;
     digitalWrite(pinLiftUp, LOW);
     digitalWrite(pinLiftDown, HIGH);
+    digitalWrite(pinLiftPower, HIGH);
 
     ledsBlinking = true;
   }
