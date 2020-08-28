@@ -71,7 +71,7 @@ void loop() {
     }
     else if (manualStop()) {
       stopLift();
-      setLiftMiddle();
+      setLiftPosition();
     }
   }
   else if (liftRunningDown) {
@@ -81,7 +81,7 @@ void loop() {
     }
     else if (manualStop()) {
       stopLift();
-      setLiftMiddle();
+      setLiftPosition();
     }
   }
   else { // lift stopped
