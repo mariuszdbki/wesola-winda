@@ -28,6 +28,17 @@ bool liftDown = false;
 bool lockPressBtnUp = false;
 bool lockPressBtnDown = false;
 
+// in lift btn states (reverse logic)
+int stateBtnUp = HIGH;
+int stateBtnDown = HIGH;
+
+int lastStateBtnUp = HIGH;
+int lastStateBtnDown = HIGH;
+
+unsigned long lastDebounceTimeBtnUp = 0;
+unsigned long lastDebounceTimeBtnDown = 0;
+unsigned long debounceDelay = 100;
+
 const int ledsBlinkingInterval = 800;
 bool ledsBlinking = false;
 int ledsCallState = LOW;
@@ -85,7 +96,8 @@ void loop() {
   if (ledsBlinking) {
     processLedsBlinking();
   }
-  // @todo: obsłużyć ledy i reakcje na przyciski "call" gdy winda jedzie - a dokładnie brak tej reakcji (czyli tylko migać ledami)
+
+  processLiftButtons(); // debouncing in lift buttons
 }
 
 void setLiftPosition() {
@@ -120,6 +132,25 @@ void stopLift() {
   liftRunningUp = false;
 
   stopLedsBlinking();
+
+  waitAndSignalStop();
+}
+
+void waitAndSignalStop() {
+  // wait 1s ignoring all input
+
+  for (int i=0;i<2;i++) {
+    digitalWrite(pinLedCallUp, HIGH);
+    digitalWrite(pinLedCallDown, HIGH);
+    digitalWrite(pinLedBtnUp, HIGH);
+    digitalWrite(pinLedBtnDown, HIGH);
+    delay(250);
+    digitalWrite(pinLedCallUp, LOW);
+    digitalWrite(pinLedCallDown, LOW);
+    digitalWrite(pinLedBtnUp, LOW);
+    digitalWrite(pinLedBtnDown, LOW);
+    delay(250);
+  }
 }
 
 void setLiftUp() {
@@ -147,12 +178,32 @@ bool calledDown() {
   return digitalRead(pinCallDown) == LOW;
 }
 
+void processLiftButtons() {
+  int readingUp = digitalRead(pinBtnUp);
+  if (readingUp != lastStateBtnUp) {
+    lastDebounceTimeBtnUp = millis();
+  }
+  if ((millis() - lastDebounceTimeBtnUp) > debounceDelay) {
+    stateBtnUp = readingUp;
+  }
+  lastStateBtnUp = readingUp;
+
+  int readingDown = digitalRead(pinBtnDown);
+  if (readingDown != lastStateBtnDown) {
+    lastDebounceTimeBtnDown = millis();
+  }
+  if ((millis() - lastDebounceTimeBtnDown) > debounceDelay) {
+    stateBtnDown = readingDown;
+  }
+  lastStateBtnDown = readingDown;
+}
+
 bool pressedBtnUp() {
-  if (!lockPressBtnUp && digitalRead(pinBtnUp) == LOW) {
+  if (!lockPressBtnUp && stateBtnUp == LOW) {
     lockPressBtnUp = true;
     return true;
   }
-  else if (lockPressBtnUp && digitalRead(pinBtnUp) == HIGH) { // press locked but btn not pressed - so unlocking
+  else if (lockPressBtnUp && stateBtnUp == HIGH) { // press locked but btn not pressed - so unlocking
     lockPressBtnUp = false;
     return false;
   }
@@ -160,11 +211,11 @@ bool pressedBtnUp() {
 }
 
 bool pressedBtnDown() {
-  if (!lockPressBtnDown && digitalRead(pinBtnDown) == LOW) {
+  if (!lockPressBtnDown && stateBtnDown == LOW) {
     lockPressBtnDown = true;
     return true;
   }
-  else if (lockPressBtnDown && digitalRead(pinBtnDown) == HIGH) { // press locked but btn not pressed - so unlocking
+  else if (lockPressBtnDown && stateBtnDown == HIGH) { // press locked but btn not pressed - so unlocking
     lockPressBtnDown = false;
     return false;
   }
@@ -188,6 +239,7 @@ void startLiftUp() {
     digitalWrite(pinLiftPower, HIGH);
 
     ledsBlinking = true;
+    digitalWrite(pinLedBtnUp, HIGH);
   }
 }
 
@@ -200,6 +252,7 @@ void startLiftDown() {
     digitalWrite(pinLiftPower, HIGH);
 
     ledsBlinking = true;
+    digitalWrite(pinLedBtnDown, HIGH);
   }
 }
 
