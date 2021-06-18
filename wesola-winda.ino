@@ -1,17 +1,25 @@
 // pins configuration
 // pins 0-1 are for serial communication
+
+// 2,3 - pins for lift motor relays
 const int pinLiftUp = 2;
 const int pinLiftDown = 3;
-const int pinLiftPower = 4;
+// 4 - reserved (old version, power relay)
+
+// 5-8 - buttons
 const int pinCallUp = 5;
 const int pinCallDown = 6;
 const int pinBtnUp = 7;
 const int pinBtnDown = 8;
+
+// 9-12 - signal leds
 const int pinLedCallUp = 9;
 const int pinLedCallDown = 10;
 const int pinLedBtnUp = 11;
 const int pinLedBtnDown = 12;
 // pin 13 is for builtin LED
+
+// 14-15 - auto-stop switches
 const int pinStopUp = 14;
 const int pinStopDown = 15;
 
@@ -48,17 +56,20 @@ unsigned long ledsLastTime;
 void setup() {
   pinMode(pinLiftUp, OUTPUT);
   pinMode(pinLiftDown, OUTPUT);
-  pinMode(pinLiftPower, OUTPUT);
+  
   pinMode(pinStopUp, INPUT);
   pinMode(pinStopDown, INPUT);
+  
   pinMode(pinCallUp, INPUT_PULLUP);
   pinMode(pinCallDown, INPUT_PULLUP);
   pinMode(pinBtnUp, INPUT_PULLUP);
   pinMode(pinBtnDown, INPUT_PULLUP);
+  
   pinMode(pinLedCallUp, OUTPUT);
   pinMode(pinLedCallDown, OUTPUT);
   pinMode(pinLedBtnUp, OUTPUT);
   pinMode(pinLedBtnDown, OUTPUT);
+  
   stopLift();
   setLiftPosition();
 }
@@ -127,8 +138,7 @@ bool manualStop() {
 void stopLift() {
   digitalWrite(pinLiftUp, LOW);
   digitalWrite(pinLiftDown, LOW);
-  delay(500);
-  digitalWrite(pinLiftPower, LOW);
+  
   liftRunningDown = false;
   liftRunningUp = false;
 
@@ -236,10 +246,8 @@ void startLiftUp() {
     liftRunningUp = true;
     liftRunningDown = false;
     digitalWrite(pinLiftDown, LOW);
-    digitalWrite(pinLiftPower, HIGH);
-    delay(500);
+    delay(50);
     digitalWrite(pinLiftUp, HIGH);
-    
 
     ledsBlinking = true;
     digitalWrite(pinLedBtnUp, HIGH);
@@ -251,11 +259,9 @@ void startLiftDown() {
     liftRunningUp = false;
     liftRunningDown = true;
     digitalWrite(pinLiftUp, LOW);
-    digitalWrite(pinLiftPower, HIGH);
-    delay(500);
+    delay(50);
     digitalWrite(pinLiftDown, HIGH);
     
-
     ledsBlinking = true;
     digitalWrite(pinLedBtnDown, HIGH);
   }
