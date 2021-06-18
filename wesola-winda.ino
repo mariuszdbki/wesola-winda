@@ -127,6 +127,7 @@ bool manualStop() {
 void stopLift() {
   digitalWrite(pinLiftUp, LOW);
   digitalWrite(pinLiftDown, LOW);
+  delay(500);
   digitalWrite(pinLiftPower, LOW);
   liftRunningDown = false;
   liftRunningUp = false;
@@ -235,8 +236,10 @@ void startLiftUp() {
     liftRunningUp = true;
     liftRunningDown = false;
     digitalWrite(pinLiftDown, LOW);
-    digitalWrite(pinLiftUp, HIGH);
     digitalWrite(pinLiftPower, HIGH);
+    delay(500);
+    digitalWrite(pinLiftUp, HIGH);
+    
 
     ledsBlinking = true;
     digitalWrite(pinLedBtnUp, HIGH);
@@ -248,8 +251,10 @@ void startLiftDown() {
     liftRunningUp = false;
     liftRunningDown = true;
     digitalWrite(pinLiftUp, LOW);
-    digitalWrite(pinLiftDown, HIGH);
     digitalWrite(pinLiftPower, HIGH);
+    delay(500);
+    digitalWrite(pinLiftDown, HIGH);
+    
 
     ledsBlinking = true;
     digitalWrite(pinLedBtnDown, HIGH);
