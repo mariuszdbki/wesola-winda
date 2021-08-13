@@ -1,7 +1,7 @@
 // pins configuration
 // pins 0-1 are for serial communication
 
-// 2,3 - pins for lift motor relays
+// 2,3 - pins for lift motor relays (low level triggered)
 const int pinLiftUp = 2;
 const int pinLiftDown = 3;
 // 4 - reserved (old version, power relay)
@@ -136,8 +136,9 @@ bool manualStop() {
 }
 
 void stopLift() {
-  digitalWrite(pinLiftUp, LOW);
-  digitalWrite(pinLiftDown, LOW);
+  // relay is low level triggered
+  digitalWrite(pinLiftUp, HIGH);
+  digitalWrite(pinLiftDown, HIGH);
   
   liftRunningDown = false;
   liftRunningUp = false;
@@ -245,9 +246,9 @@ void startLiftUp() {
   if (canStartUp()) {
     liftRunningUp = true;
     liftRunningDown = false;
-    digitalWrite(pinLiftDown, LOW);
+    digitalWrite(pinLiftDown, HIGH); // stop
     delay(50);
-    digitalWrite(pinLiftUp, HIGH);
+    digitalWrite(pinLiftUp, LOW); // start
 
     ledsBlinking = true;
     digitalWrite(pinLedBtnUp, HIGH);
@@ -258,9 +259,9 @@ void startLiftDown() {
   if (canStartDown()) {
     liftRunningUp = false;
     liftRunningDown = true;
-    digitalWrite(pinLiftUp, LOW);
+    digitalWrite(pinLiftUp, HIGH); // stop
     delay(50);
-    digitalWrite(pinLiftDown, HIGH);
+    digitalWrite(pinLiftDown, LOW); // start
     
     ledsBlinking = true;
     digitalWrite(pinLedBtnDown, HIGH);
